@@ -13,7 +13,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_puede_comenzar_una_lista_y_recuperarla_mas_tarde(self):
         self.browser.get('http://localhost:8000')
 
-        self.assertIn('Hacer', self.browser.title)
+        self.assertIn('tareas', self.browser.title)
         self.fail('Terminar el test!')
 
 
