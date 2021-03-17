@@ -9,23 +9,6 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'home.html')
 
-    def test_puede_salvar_un_request_POST(self):
-        self.client.post('/', data={'texto_item': 'Nuevo item'})
-
-        self.assertEqual(Item.objects.count(), 1)
-        nuevo_item = Item.objects.first()
-        self.assertEqual(nuevo_item.texto, 'Nuevo item')
-
-    def test_redirige_luego_de_un_post(self):
-        response = self.client.post('/', data={'texto_item': 'Nuevo item'})
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/listas/la_unica_lista/')
-
-    def test_solo_guarda_items_cuando_es_necesario(self):
-        self.client.get('/')
-        self.assertEqual(Item.objects.count(), 0)
-
 
 class ListaViewTest(TestCase):
 
@@ -41,6 +24,21 @@ class ListaViewTest(TestCase):
 
         self.assertContains(response, 'Itemio 1')
         self.assertContains(response, 'Itemio 2')
+
+
+class NuevaListaViewTest(TestCase):
+
+    def test_puede_salvar_un_request_POST(self):
+        self.client.post('/listas/nueva', data={'texto_item': 'Nuevo item'})
+
+        self.assertEqual(Item.objects.count(), 1)
+        nuevo_item = Item.objects.first()
+        self.assertEqual(nuevo_item.texto, 'Nuevo item')
+
+    def test_redirige_luego_de_un_post(self):
+        response = self.client.post(
+            '/listas/nueva', data={'texto_item': 'Nuevo item'})
+        self.assertRedirects(response, '/listas/la_unica_lista/')
 
 
 class ItemModelTest(TestCase):

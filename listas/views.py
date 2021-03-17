@@ -4,10 +4,12 @@ from listas.models import Item
 
 
 def home_page(request):
-    if request.method == 'POST':
-        Item.objects.create(texto=request.POST['texto_item'])
-        return redirect('/listas/la_unica_lista/')
     return render(request, 'home.html')
+
+
+def nueva_lista(request):
+    Item.objects.create(texto=request.POST['texto_item'])
+    return redirect('/listas/la_unica_lista/')
 
 
 def view_lista(request):
