@@ -34,7 +34,8 @@ class NewVisitorTest(unittest.TestCase):
         tabla = self.browser.find_element_by_id('id_tabla_lista')
         filas = tabla.find_elements_by_tag_name('tr')
         self.assertTrue(
-            any(fila.text == '1: Hacer las compras' for fila in filas)
+            any(fila.text == '1: Hacer las compras' for fila in filas),
+            "La nueva tarea no apareció en la tabla."
         )
 
         self.fail('Terminar el test!')
