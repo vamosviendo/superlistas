@@ -1,7 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+
+from listas.models import Item
 
 
 def home_page(request):
-    return render(request, 'home.html', {
-        'texto_nuevo_item': request.POST.get('texto_item', '')
-    })
+    if request.method == 'POST':
+        Item.objects.create(texto=request.POST['texto_item'])
+        return redirect('/')
+
+    items = Item.objects.all()
+    return render(request, 'home.html', {'items': items})
