@@ -4,7 +4,12 @@
   </head>
   <body>
     <h1>Listas de tareas</h1>
-    <input id="id_item_nuevo" placeholder="Ingrese una tarea"/>
-    <table id="id_tabla_lista"></table>
+    <form method="POST">
+      <input name="texto_item" id="id_item_nuevo" placeholder="Ingrese una tarea"/>
+      {% csrf_token %}
+    </form>
+    <table id="id_tabla_lista">
+      <tr><td>1: {{ texto_nuevo_item }}</td></tr>
+    </table>
   </body>
 </html>

@@ -33,10 +33,17 @@ class NewVisitorTest(unittest.TestCase):
 
         tabla = self.browser.find_element_by_id('id_tabla_lista')
         filas = tabla.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(fila.text == '1: Hacer las compras' for fila in filas),
-            "La nueva tarea no apareció en la tabla."
-        )
+        self.assertIn('1: Hacer las compras', [fila.text for fila in filas])
+
+        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox.send_keys('Guardar las vituallas')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        tabla = self.browser.find_element_by_id('id_tabla_lista')
+        filas = tabla.find_elements_by_tag_name('tr')
+        self.assertIn('1: Hacer las compras', [fila.text for fila in filas])
+        self.assertIn('2: Guardar las vituallas', [fila.text for fila in filas])
 
         self.fail('Terminar el test!')
 
