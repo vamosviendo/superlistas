@@ -4,3 +4,4 @@ vlistas
 __pycache__
 *.pyc
 .idea
+/static
