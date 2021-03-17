@@ -1,17 +1,13 @@
-<html>
-  <head>
-    <title>Listas de tareas</title>
-  </head>
-  <body>
-    <h1>Listas de tareas</h1>
-    <form method="POST" action="/listas/{{ lista.id }}/agregar_item">
-      <input name="texto_item" id="id_item_nuevo" placeholder="Ingrese una tarea"/>
-      {% csrf_token %}
-    </form>
-    <table id="id_tabla_lista">
-      {% for item in lista.item_set.all %}
-        <tr><td>{{ forloop.counter }}: {{ item.texto }}</td></tr>
-      {% endfor %}
-    </table>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block texto_encabezado %}Tu lista de tareas{% endblock texto_encabezado %}
+
+{% block form_action %}/listas/{{ lista.id }}/agregar_item{% endblock form_action %}
+
+{% block tabla %}
+<table id="id_tabla_lista">
+  {% for item in lista.item_set.all %}
+  <tr><td>{{ forloop.counter }}: {{ item.texto }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock tabla %}

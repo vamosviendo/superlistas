@@ -1,12 +1,5 @@
-<html>
-  <head>
-    <title>Listas de tareas</title>
-  </head>
-  <body>
-    <h1>Listas de tareas</h1>
-    <form method="POST" action="/listas/nueva">
-      <input name="texto_item" id="id_item_nuevo" placeholder="Ingrese una tarea"/>
-      {% csrf_token %}
-    </form>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block texto_encabezado %}Comenzar una nueva lista de tareas{% endblock texto_encabezado %}
+
+{% block form_action %}/listas/nueva{% endblock form_action %}
