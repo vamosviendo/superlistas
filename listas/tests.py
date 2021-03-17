@@ -20,20 +20,28 @@ class HomePageTest(TestCase):
         response = self.client.post('/', data={'texto_item': 'Nuevo item'})
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/listas/la_unica_lista/')
 
     def test_solo_guarda_items_cuando_es_necesario(self):
         self.client.get('/')
         self.assertEqual(Item.objects.count(), 0)
 
-    def test_muestra_todos_los_items_de_la_lista(self):
+
+class ListaViewTest(TestCase):
+
+    def test_usa_template_lista(self):
+        response = self.client.get('/listas/la_unica_lista/')
+        self.assertTemplateUsed(response, 'lista.html')
+
+    def test_muestra_todos_los_items(self):
         Item.objects.create(texto='Itemio 1')
         Item.objects.create(texto='Itemio 2')
 
-        response = self.client.get('/')
+        response = self.client.get('/listas/la_unica_lista/')
 
-        self.assertIn('Itemio 1', response.content.decode())
-        self.assertIn('Itemio 2', response.content.decode())
+        self.assertContains(response, 'Itemio 1')
+        self.assertContains(response, 'Itemio 2')
+
 
 class ItemModelTest(TestCase):
 

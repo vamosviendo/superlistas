@@ -19,4 +19,5 @@ from listas import views
 
 urlpatterns = [
     path('', views.home_page, name='home'),
+    path('listas/la_unica_lista/', views.view_lista, name='view_lista'),
 ]

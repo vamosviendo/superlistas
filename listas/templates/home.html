@@ -4,14 +4,9 @@
   </head>
   <body>
     <h1>Listas de tareas</h1>
-    <form method="POST">
+    <form method="POST" action="/">
       <input name="texto_item" id="id_item_nuevo" placeholder="Ingrese una tarea"/>
       {% csrf_token %}
     </form>
-    <table id="id_tabla_lista">
-      {% for item in items %}
-        <tr><td>{{ forloop.counter }}: {{ item.texto }}</td></tr>
-      {% endfor %}
-    </table>
   </body>
 </html>

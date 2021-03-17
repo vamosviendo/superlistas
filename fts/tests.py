@@ -7,7 +7,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 
 
-MAX_WAIT = 10
+MAX_WAIT = 2
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -76,7 +76,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser.get(self.live_server_url)
 
         # No hay rastros de la lista de Edith
-        texto_pag = self.browser.find_elements_by_tag_name('body').text
+        texto_pag = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Hacer las compras', texto_pag)
         self.assertNotIn('vituallas', texto_pag)
 
