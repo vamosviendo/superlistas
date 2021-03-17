@@ -13,33 +13,71 @@ class HomePageTest(TestCase):
 class ListaViewTest(TestCase):
 
     def test_usa_template_lista(self):
-        response = self.client.get('/listas/la_unica_lista/')
+        lista = Lista.objects.create()
+        response = self.client.get(f'/listas/{lista.id}/')
         self.assertTemplateUsed(response, 'lista.html')
 
-    def test_muestra_todos_los_items(self):
-        lista = Lista.objects.create()
-        Item.objects.create(texto='Itemio 1', lista=lista)
-        Item.objects.create(texto='Itemio 2', lista=lista)
+    def test_muestra_solamente_los_items_de_la_lista(self):
+        lista_correcta = Lista.objects.create()
+        Item.objects.create(texto='Itemio 1', lista=lista_correcta)
+        Item.objects.create(texto='Itemio 2', lista=lista_correcta)
+        otra_lista = Lista.objects.create()
+        Item.objects.create(texto='Item de otra lista 1', lista=otra_lista)
+        Item.objects.create(texto='Item de otra lista 2', lista=otra_lista)
 
-        response = self.client.get('/listas/la_unica_lista/')
+        response = self.client.get(f'/listas/{lista_correcta.id}/')
 
         self.assertContains(response, 'Itemio 1')
         self.assertContains(response, 'Itemio 2')
+        self.assertNotContains(response, 'Item de otra lista 1')
+        self.assertNotContains(response, 'Item de otra lista 2')
+
+    def test_pasa_la_lista_correcta_al_template(self):
+        otra_lista = Lista.objects.create()
+        lista_correcta = Lista.objects.create()
+        response = self.client.get(f'/listas/{lista_correcta.id}/')
+        self.assertEqual(response.context['lista'], lista_correcta)
 
 
 class NuevaListaViewTest(TestCase):
 
-    def test_puede_salvar_un_request_POST(self):
+    def test_puede_guardar_un_request_POST(self):
         self.client.post('/listas/nueva', data={'texto_item': 'Nuevo item'})
 
         self.assertEqual(Item.objects.count(), 1)
         nuevo_item = Item.objects.first()
         self.assertEqual(nuevo_item.texto, 'Nuevo item')
 
+    def test_puede_guardar_un_request_POST_en_una_lista_existente(self):
+        otra_lista = Lista.objects.create()
+        lista_correcta = Lista.objects.create()
+
+        self.client.post(
+            f'/listas/{lista_correcta.id}/agregar_item',
+            data={'texto_item': 'Nuevo item para lista existente.'}
+        )
+
+        self.assertEqual(Item.objects.count(), 1)
+        nuevo_item = Item.objects.first()
+        self.assertEqual(nuevo_item.texto, 'Nuevo item para lista existente.')
+        self.assertEqual(nuevo_item.lista, lista_correcta)
+
+    def test_redirige_a_view_lista(self):
+        otra_lista = Lista.objects.create()
+        lista_correcta = Lista.objects.create()
+
+        response = self.client.post(
+            f'/listas/{lista_correcta.id}/agregar_item',
+            data={'texto_item': 'Nuevo item para lista existente.'}
+        )
+
+        self.assertRedirects(response, f'/listas/{lista_correcta.id}/')
+
     def test_redirige_luego_de_un_post(self):
         response = self.client.post(
             '/listas/nueva', data={'texto_item': 'Nuevo item'})
-        self.assertRedirects(response, '/listas/la_unica_lista/')
+        nueva_lista = Lista.objects.first()
+        self.assertRedirects(response, f'/listas/{nueva_lista.id}/')
 
 
 class ListaAndItemModelTest(TestCase):

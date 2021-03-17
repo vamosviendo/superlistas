@@ -20,5 +20,10 @@ from listas import views
 urlpatterns = [
     path('', views.home_page, name='home'),
     path('listas/nueva', views.nueva_lista, name='nueva_lista'),
-    path('listas/la_unica_lista/', views.view_lista, name='view_lista'),
+    path('listas/<int:lista_id>/', views.view_lista, name='view_lista'),
+    path(
+        'listas/<int:lista_id>/agregar_item',
+        views.agregar_item,
+        name='agregar_item'
+    ),
 ]
