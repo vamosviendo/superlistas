@@ -1,11 +1,12 @@
 import time
-import unittest
+
+from django.test import LiveServerTestCase
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -19,7 +20,7 @@ class NewVisitorTest(unittest.TestCase):
         self.assertIn(texto_fila, [fila.text for fila in filas])
 
     def test_puede_comenzar_una_lista_y_recuperarla_mas_tarde(self):
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # El título y el encabezado de la página mencionan listas de tareas
         self.assertIn('tareas', self.browser.title)
@@ -47,7 +48,3 @@ class NewVisitorTest(unittest.TestCase):
         self.buscar_fila_en_tabla_lista('2: Guardar las vituallas')
 
         self.fail('Terminar el test!')
-
-
-if __name__ == '__main__':
-    unittest.main()
