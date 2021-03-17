@@ -13,6 +13,11 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def buscar_fila_en_tabla_lista(self, texto_fila):
+        tabla = self.browser.find_element_by_id('id_tabla_lista')
+        filas = tabla.find_elements_by_tag_name('tr')
+        self.assertIn(texto_fila, [fila.text for fila in filas])
+
     def test_puede_comenzar_una_lista_y_recuperarla_mas_tarde(self):
         self.browser.get('http://localhost:8000')
 
@@ -31,19 +36,15 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        tabla = self.browser.find_element_by_id('id_tabla_lista')
-        filas = tabla.find_elements_by_tag_name('tr')
-        self.assertIn('1: Hacer las compras', [fila.text for fila in filas])
+        self.buscar_fila_en_tabla_lista('1: Hacer las compras')
 
         inputbox = self.browser.find_element_by_id('id_item_nuevo')
         inputbox.send_keys('Guardar las vituallas')
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        tabla = self.browser.find_element_by_id('id_tabla_lista')
-        filas = tabla.find_elements_by_tag_name('tr')
-        self.assertIn('1: Hacer las compras', [fila.text for fila in filas])
-        self.assertIn('2: Guardar las vituallas', [fila.text for fila in filas])
+        self.buscar_fila_en_tabla_lista('1: Hacer las compras')
+        self.buscar_fila_en_tabla_lista('2: Guardar las vituallas')
 
         self.fail('Terminar el test!')
 
