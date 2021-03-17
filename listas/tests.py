@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from listas.models import Item
+from listas.models import Item, Lista
 
 
 class HomePageTest(TestCase):
@@ -17,8 +17,9 @@ class ListaViewTest(TestCase):
         self.assertTemplateUsed(response, 'lista.html')
 
     def test_muestra_todos_los_items(self):
-        Item.objects.create(texto='Itemio 1')
-        Item.objects.create(texto='Itemio 2')
+        lista = Lista.objects.create()
+        Item.objects.create(texto='Itemio 1', lista=lista)
+        Item.objects.create(texto='Itemio 2', lista=lista)
 
         response = self.client.get('/listas/la_unica_lista/')
 
@@ -41,16 +42,23 @@ class NuevaListaViewTest(TestCase):
         self.assertRedirects(response, '/listas/la_unica_lista/')
 
 
-class ItemModelTest(TestCase):
+class ListaAndItemModelTest(TestCase):
 
     def test_salvar_y_recuperar_items(self):
+        lista = Lista()
+        lista.save()
         primer_item = Item()
         primer_item.texto = 'El primer item de la lista'
+        primer_item.lista = lista
         primer_item.save()
 
         segundo_item = Item()
         segundo_item.texto = 'Segundo item'
+        segundo_item.lista = lista
         segundo_item.save()
+
+        lista_guardada = Lista.objects.first()
+        self.assertEqual(lista_guardada, lista)
 
         items_guardados = Item.objects.all()
         self.assertEqual(items_guardados.count(), 2)
@@ -59,4 +67,6 @@ class ItemModelTest(TestCase):
         segundo_item_guardado = items_guardados[1]
         self.assertEqual(
             primer_item_guardado.texto, 'El primer item de la lista')
+        self.assertEqual(primer_item_guardado.lista, lista)
         self.assertEqual(segundo_item_guardado.texto, 'Segundo item')
+        self.assertEqual(segundo_item_guardado.lista, lista)

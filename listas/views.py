@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 
-from listas.models import Item
+from listas.models import Item, Lista
 
 
 def home_page(request):
@@ -8,7 +8,8 @@ def home_page(request):
 
 
 def nueva_lista(request):
-    Item.objects.create(texto=request.POST['texto_item'])
+    lista = Lista.objects.create()
+    Item.objects.create(texto=request.POST['texto_item'], lista=lista)
     return redirect('/listas/la_unica_lista/')
 
 
