@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn server for DOMAIN
+
+[Service]
+Restart=on-failure
+User=nando
+WorkingDirectory=/home/nando/sites/DOMAIN
+EnvironmentFile=/home/nando/sites/DOMAIN/.env
+
+ExecStart=/home/nando/sites/DOMAIN/vlistas/bin/gunicorn \
+    --bind unix:/tmp/DOMAIN.socket \
+    superlists.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
