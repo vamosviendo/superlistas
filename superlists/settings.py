@@ -23,7 +23,7 @@ if 'DJANGO_DEBUG_FALSE' in environ:
     DEBUG = False
     SECRET_KEY = environ['DJANGO_SECRET_KEY']
     ALLOWED_HOSTS = [environ['SITENAME']]
-else
+else:
     DEBUG = True
     SECRET_KEY = '12zn$478f@k2@pffy-d!3^p5^&plx6rkn%^0wxi7(3pcbai+oa'
     ALLOWED_HOSTS = ['*']
