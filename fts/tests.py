@@ -8,7 +8,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 
 
-MAX_WAIT = 2
+MAX_WAIT = 5
 
 
 class NewVisitorTest(StaticLiveServerTestCase):
