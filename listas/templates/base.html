@@ -20,6 +20,11 @@
                    id="id_item_nuevo" class="form-control input-lg"
                    placeholder="Ingrese una tarea"/>
             {% csrf_token %}
+            {% if error %}
+            <div class="form-group has-error">
+              <span class="help-block">{{ error }}</span>
+            </div>
+            {% endif %}
           </form>
         </div>
       </div>

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from listas.models import Item, Lista
@@ -31,3 +32,10 @@ class ListaAndItemModelTest(TestCase):
         self.assertEqual(primer_item_guardado.lista, lista)
         self.assertEqual(segundo_item_guardado.texto, 'Segundo item')
         self.assertEqual(segundo_item_guardado.lista, lista)
+
+    def test_no_puede_guardar_items_de_lista_vacios(self):
+        lista = Lista.objects.create()
+        item = Item(lista=lista, texto='')
+        with self.assertRaises(ValidationError):
+            item.save()
+            item.full_clean()

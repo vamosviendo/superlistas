@@ -78,3 +78,15 @@ class NuevaListaViewTest(TestCase):
             '/listas/nueva', data={'texto_item': 'Nuevo item'})
         nueva_lista = Lista.objects.first()
         self.assertRedirects(response, f'/listas/{nueva_lista.id}/')
+
+    def test_errores_de_validacion_se_envian_de_vuelta_a_template_home(self):
+        response = self.client.post('/listas/nueva', data={'texto_item': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+        error_esperado = 'No puede haber un item vacío en la lista.'
+        self.assertContains(response, error_esperado)
+
+    def test_items_de_lista_no_validos_no_se_guardan(self):
+        self.client.post('/listas/nueva', data={'texto_item': ''})
+        self.assertEqual(Lista.objects.count(), 0)
+        self.assertEqual(Item.objects.count(), 0)

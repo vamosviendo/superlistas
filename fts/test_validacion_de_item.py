@@ -17,7 +17,7 @@ class ValidacionItemsTest(FunctionalTest):
 
         self.browser.find_element_by_id('id_item_nuevo').send_keys('comprar')
         self.browser.find_element_by_id('id_item_nuevo').send_keys(Keys.ENTER)
-        self.esperar_fila_en_tabla_lista('1: Comprar leche')
+        self.esperar_fila_en_tabla_lista('1: comprar')
 
         self.browser.find_element_by_id('id_item_nuevo').send_keys(Keys.ENTER)
 
@@ -28,8 +28,8 @@ class ValidacionItemsTest(FunctionalTest):
 
         self.browser.find_element_by_id('id_item_nuevo').send_keys('hacer té')
         self.browser.find_element_by_id('id_item_nuevo').send_keys(Keys.ENTER)
-        self.esperar_fila_en_tabla_lista('1: Comprar leche')
-        self.esperar_fila_en_tabla_lista('2: Hacer té')
+        self.esperar_fila_en_tabla_lista('1: comprar')
+        self.esperar_fila_en_tabla_lista('2: hacer té')
 
 
         self.fail('Terminar el test!')
