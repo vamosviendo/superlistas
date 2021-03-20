@@ -1,39 +1,10 @@
-import os
-import time
-
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 
+from .base import FunctionalTest
 
-MAX_WAIT = 5
 
-
-class NewVisitorTest(StaticLiveServerTestCase):
-
-    def setUp(self):
-        self.browser = webdriver.Firefox()
-        staging_server = os.environ.get('STAGING_SERVER')
-        if staging_server:
-            self.live_server_url = 'http://' + staging_server
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def esperar_fila_en_tabla_lista(self, texto_fila):
-        inicio = time.time()
-        while True:
-            try:
-                tabla = self.browser.find_element_by_id('id_tabla_lista')
-                filas = tabla.find_elements_by_tag_name('tr')
-                self.assertIn(texto_fila, [fila.text for fila in filas])
-                return
-            except (AssertionError, WebDriverException) as e:
-                if time.time() - inicio > MAX_WAIT:
-                    raise e
-                time.sleep(0.5)
+class NewVisitorTest(FunctionalTest):
 
     def test_puede_comenzar_una_lista_y_recuperarla_mas_tarde(self):
         self.browser.get(self.live_server_url)
@@ -99,25 +70,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         texto_pag = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Hacer las compras', texto_pag)
         self.assertIn('Cortar el pasto', texto_pag)
-
-    def test_distribucion_y_estilo(self):
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
-
-        # El campo inputbox debe estar centrado en la página
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10
-        )
-
-        inputbox.send_keys('testing')
-        inputbox.send_keys(Keys.ENTER)
-        self.esperar_fila_en_tabla_lista('1: testing')
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10
-        )
