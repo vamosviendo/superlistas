@@ -38,6 +38,31 @@ class ListaViewTest(TestCase):
         response = self.client.get(f'/listas/{lista_correcta.id}/')
         self.assertEqual(response.context['lista'], lista_correcta)
 
+    def test_puede_guardar_un_request_POST_en_una_lista_existente(self):
+        otra_lista = Lista.objects.create()
+        lista_correcta = Lista.objects.create()
+
+        self.client.post(
+            f'/listas/{lista_correcta.id}/',
+            data={'texto_item': 'Nuevo item para lista existente.'}
+        )
+
+        self.assertEqual(Item.objects.count(), 1)
+        nuevo_item = Item.objects.first()
+        self.assertEqual(nuevo_item.texto, 'Nuevo item para lista existente.')
+        self.assertEqual(nuevo_item.lista, lista_correcta)
+
+    def test_POST_redirige_a_view_lista(self):
+        otra_lista = Lista.objects.create()
+        lista_correcta = Lista.objects.create()
+
+        response = self.client.post(
+            f'/listas/{lista_correcta.id}/',
+            data={'texto_item': 'Nuevo item para lista existente.'}
+        )
+
+        self.assertRedirects(response, f'/listas/{lista_correcta.id}/')
+
 
 class NuevaListaViewTest(TestCase):
 
@@ -47,31 +72,6 @@ class NuevaListaViewTest(TestCase):
         self.assertEqual(Item.objects.count(), 1)
         nuevo_item = Item.objects.first()
         self.assertEqual(nuevo_item.texto, 'Nuevo item')
-
-    def test_puede_guardar_un_request_POST_en_una_lista_existente(self):
-        otra_lista = Lista.objects.create()
-        lista_correcta = Lista.objects.create()
-
-        self.client.post(
-            f'/listas/{lista_correcta.id}/agregar_item',
-            data={'texto_item': 'Nuevo item para lista existente.'}
-        )
-
-        self.assertEqual(Item.objects.count(), 1)
-        nuevo_item = Item.objects.first()
-        self.assertEqual(nuevo_item.texto, 'Nuevo item para lista existente.')
-        self.assertEqual(nuevo_item.lista, lista_correcta)
-
-    def test_redirige_a_view_lista(self):
-        otra_lista = Lista.objects.create()
-        lista_correcta = Lista.objects.create()
-
-        response = self.client.post(
-            f'/listas/{lista_correcta.id}/agregar_item',
-            data={'texto_item': 'Nuevo item para lista existente.'}
-        )
-
-        self.assertRedirects(response, f'/listas/{lista_correcta.id}/')
 
     def test_redirige_luego_de_un_post(self):
         response = self.client.post(

@@ -20,6 +20,4 @@ from listas import views
 urlpatterns = [
     path('nueva', views.nueva_lista, name='nueva_lista'),
     path('<int:lista_id>/', views.view_lista, name='view_lista'),
-    path(
-        '<int:lista_id>/agregar_item', views.agregar_item, name='agregar_item'),
 ]
