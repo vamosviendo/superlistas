@@ -21,6 +21,16 @@ class FunctionalTest(StaticLiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def esperar_a(self, fn):
+        inicio = time.time()
+        while True:
+            try:
+                return fn()
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - inicio > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
+
     def esperar_fila_en_tabla_lista(self, texto_fila):
         inicio = time.time()
         while True:
