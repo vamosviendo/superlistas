@@ -10,29 +10,22 @@ def home_page(request):
 
 
 def nueva_lista(request):
-    lista = Lista.objects.create()
-    item = Item(texto=request.POST['texto'], lista=lista)
-    try:
-        item.full_clean()
-        item.save()
-    except ValidationError:
-        lista.delete()
-        error = 'No puede haber un item vacío en la lista.'
-        return render(request, 'home.html', {'error': error})
-    return redirect(lista)
+    form = ItemForm(data=request.POST)
+    if form.is_valid():
+        lista = Lista.objects.create()
+        Item.objects.create(texto=request.POST['texto'], lista=lista)
+        return redirect(lista)
+    else:
+        return render(request, 'home.html', {'form': form})
 
 
 def view_lista(request, lista_id):
     lista = Lista.objects.get(id=lista_id)
-    error = None
+    form = ItemForm()
 
     if request.method == 'POST':
-        try:
-            item = Item(texto=request.POST['texto'], lista=lista)
-            item.full_clean()
-            item.save()
+        form = ItemForm(data=request.POST)
+        if form.is_valid():
+            Item.objects.create(texto=request.POST['texto'], lista=lista)
             return redirect(lista)
-        except ValidationError:
-            error = 'No puede haber un item vacío en la lista.'
-
-    return render(request, 'lista.html', {'lista': lista, 'error': error})
+    return render(request, 'lista.html', {'lista': lista, 'form': form})

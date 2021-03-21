@@ -10,23 +10,24 @@ class ValidacionItemsTest(FunctionalTest):
         self.browser.get(self.live_server_url)
         self.buscar_campo_de_entrada_item().send_keys(Keys.ENTER)
 
-        self.esperar_a(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector('.has-error').text,
-            "No puede haber un item vacío en la lista."
-        ))
+        self.esperar_a(lambda:
+            self.browser.find_element_by_css_selector('#id_texto:invalid'))
 
         self.buscar_campo_de_entrada_item().send_keys('comprar')
+        self.esperar_a(lambda: self.browser.find_element_by_css_selector(
+            "#id_texto:valid"))
         self.buscar_campo_de_entrada_item().send_keys(Keys.ENTER)
         self.esperar_fila_en_tabla_lista('1: comprar')
 
         self.buscar_campo_de_entrada_item().send_keys(Keys.ENTER)
 
-        self.esperar_a(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector('.has-error').text,
-            "No puede haber un item vacío en la lista."
-        ))
+        self.esperar_fila_en_tabla_lista('1: comprar')
+        self.esperar_a(lambda: self.browser.find_element_by_css_selector(
+            '#id_texto:invalid'))
 
         self.buscar_campo_de_entrada_item().send_keys('hacer té')
+        self.esperar_a(lambda: self.browser.find_element_by_css_selector(
+            "#id_texto:valid"))
         self.buscar_campo_de_entrada_item().send_keys(Keys.ENTER)
         self.esperar_fila_en_tabla_lista('1: comprar')
         self.esperar_fila_en_tabla_lista('2: hacer té')

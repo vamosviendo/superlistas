@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from listas.forms import ItemForm
+from listas.forms import ItemForm, ERROR_ITEM_VACIO
 from listas.models import Item, Lista
 
 
@@ -16,6 +16,10 @@ class HomePageTest(TestCase):
 
 
 class ListaViewTest(TestCase):
+
+    def postear_entrada_vacia(self):
+        lista = Lista.objects.create()
+        return self.client.post(f'/listas/{lista.id}/', data={'texto': ''})
 
     def test_usa_template_lista(self):
         lista = Lista.objects.create()
@@ -68,16 +72,28 @@ class ListaViewTest(TestCase):
 
         self.assertRedirects(response, f'/listas/{lista_correcta.id}/')
 
-    def test_errores_de_validacion_llevan_a_pagina_listas(self):
-        lista = Lista.objects.create()
-        response = self.client.post(
-            f'/listas/{lista.id}/',
-            data={'texto': ''}
-        )
+    def test_la_entrada_invalida_no_se_guarda_en_bd(self):
+        self.postear_entrada_vacia()
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_si_la_entrada_no_es_valida_se_muestra_template_lista(self):
+        response = self.postear_entrada_vacia()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'lista.html')
-        error_esperado = 'No puede haber un item vacío en la lista.'
-        self.assertContains(response, error_esperado)
+
+    def test_si_la_entrada_no_es_valida_se_pasa_form_a_template(self):
+        response = self.postear_entrada_vacia()
+        self.assertIsInstance(response.context['form'], ItemForm)
+
+    def test_si_la_entrada_no_es_valida_se_muestra_error_en_la_pagina(self):
+        response = self.postear_entrada_vacia()
+        self.assertContains(response, ERROR_ITEM_VACIO)
+
+    def test_muestra_form_item(self):
+        lista = Lista.objects.create()
+        response = self.client.get(f'/listas/{lista.id}/')
+        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertContains(response, 'name="texto"')
 
 
 class NuevaListaViewTest(TestCase):
@@ -95,12 +111,18 @@ class NuevaListaViewTest(TestCase):
         nueva_lista = Lista.objects.first()
         self.assertRedirects(response, f'/listas/{nueva_lista.id}/')
 
-    def test_errores_de_validacion_se_envian_de_vuelta_a_template_home(self):
+    def test_si_la_entrada_no_es_valida_muestra_template_home(self):
         response = self.client.post('/listas/nueva', data={'texto': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
-        error_esperado = 'No puede haber un item vacío en la lista.'
-        self.assertContains(response, error_esperado)
+
+    def test_errores_de_validacion_se_muestran_en_pagina_home(self):
+        response = self.client.post('/listas/nueva', data={'texto': ''})
+        self.assertContains(response, ERROR_ITEM_VACIO)
+
+    def test_si_la_entrada_no_es_valida_pasa_form_a_template(self):
+        response = self.client.post('/listas/nueva', data={'texto': ''})
+        self.assertIsInstance(response.context['form'], ItemForm)
 
     def test_items_de_lista_no_validos_no_se_guardan(self):
         self.client.post('/listas/nueva', data={'texto': ''})
