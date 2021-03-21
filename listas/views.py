@@ -1,8 +1,7 @@
-from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
 
-from listas.forms import ItemForm
-from listas.models import Item, Lista
+from listas.forms import ItemForm, ItemListaExistenteForm
+from listas.models import Lista
 
 
 def home_page(request):
@@ -21,11 +20,11 @@ def nueva_lista(request):
 
 def view_lista(request, lista_id):
     lista = Lista.objects.get(id=lista_id)
-    form = ItemForm()
+    form = ItemListaExistenteForm(en_lista=lista)
 
     if request.method == 'POST':
-        form = ItemForm(data=request.POST)
+        form = ItemListaExistenteForm(en_lista=lista, data=request.POST)
         if form.is_valid():
-            form.save(en_lista=lista)
+            form.save()
             return redirect(lista)
     return render(request, 'lista.html', {'lista': lista, 'form': form})

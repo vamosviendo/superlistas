@@ -43,6 +43,6 @@ class ValidacionItemsTest(FunctionalTest):
         self.esperar_a(
             lambda: self.assertEqual(
                 self.browser.find_element_by_css_selector('.has-error').text,
-                "Ya existe ese item en la lista"
+                'Ya existe ese item en la lista'
             )
         )

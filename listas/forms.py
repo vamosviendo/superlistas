@@ -1,8 +1,10 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
-from listas.models import Item
+from listas.models import Item, Lista
 
 ERROR_ITEM_VACIO = 'No puede haber un item vacío en la lista.'
+ERROR_ITEM_DUPLICADO = 'Ya existe ese item en la lista'
 
 
 class ItemForm(forms.models.ModelForm):
@@ -23,3 +25,26 @@ class ItemForm(forms.models.ModelForm):
     def save(self, en_lista):
         self.instance.lista = en_lista
         return super().save()
+
+
+class ItemListaExistenteForm(ItemForm):
+
+    def __init__(self, en_lista, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.lista = en_lista
+
+    def validate_unique(self):
+        try:
+            self.instance.validate_unique()
+        except ValidationError as e:
+            e.error_dict = {'texto': [ERROR_ITEM_DUPLICADO]}
+            self._update_errors(e)
+
+    def test_form_save(self):
+        lista = Lista.objects.create()
+        form = ItemListaExistenteForm(en_lista=lista, data={'texto': 'hola'})
+        item_nuevo = form.save()
+        self.assertEqual(item_nuevo, Item.objects.all()[0])
+
+    def save(self):
+        return forms.models.ModelForm.save(self)

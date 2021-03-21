@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from listas.forms import ItemForm, ERROR_ITEM_VACIO
+from listas.forms import ItemForm, ERROR_ITEM_VACIO, ERROR_ITEM_DUPLICADO, ItemListaExistenteForm
 from listas.models import Item, Lista
 
 
@@ -83,16 +83,27 @@ class ListaViewTest(TestCase):
 
     def test_si_la_entrada_no_es_valida_se_pasa_form_a_template(self):
         response = self.postear_entrada_vacia()
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ItemListaExistenteForm)
 
     def test_si_la_entrada_no_es_valida_se_muestra_error_en_la_pagina(self):
         response = self.postear_entrada_vacia()
         self.assertContains(response, ERROR_ITEM_VACIO)
 
+    def test_errores_de_validacion_de_items_duplicados_se_muestran_en_pagina_listas(self):
+        lista1 = Lista.objects.create()
+        item1 = Item.objects.create(lista=lista1, texto='textito')
+        response = self.client.post(
+            f'/listas/{lista1.id}/',
+            data={'texto': 'textito'}
+        )
+        self.assertContains(response, ERROR_ITEM_DUPLICADO)
+        self.assertTemplateUsed(response, 'lista.html')
+        self.assertEqual(Item.objects.all().count(), 1)
+
     def test_muestra_form_item(self):
         lista = Lista.objects.create()
         response = self.client.get(f'/listas/{lista.id}/')
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ItemListaExistenteForm)
         self.assertContains(response, 'name="texto"')
 
 
