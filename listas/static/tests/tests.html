@@ -22,13 +22,13 @@
   <script>
 
 QUnit.test("errores se ocultan al pulsar una tecla", function (assert) {
-  initialize();
+  window.superlistas.initialize();
   $('input[name="texto"]').trigger('keypress');
   assert.equal($('.has-error').is(':visible'), false);
 });
 
 QUnit.test("errores se muestran si no se pulsó una tecla", function (assert) {
-  initialize();
+  window.superlistas.initialize();
   assert.equal($('.has-error').is(':visible'), true);
 });
 
