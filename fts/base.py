@@ -43,3 +43,6 @@ class FunctionalTest(StaticLiveServerTestCase):
                 if time.time() - inicio > MAX_WAIT:
                     raise e
                 time.sleep(0.5)
+
+    def buscar_campo_de_entrada_item(self):
+        return self.browser.find_element_by_id('id_texto')

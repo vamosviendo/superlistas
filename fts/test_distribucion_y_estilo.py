@@ -10,7 +10,7 @@ class DyETest(FunctionalTest):
         self.browser.set_window_size(1024, 768)
 
         # El campo inputbox debe estar centrado en la página
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox = self.buscar_campo_de_entrada_item()
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
@@ -20,7 +20,7 @@ class DyETest(FunctionalTest):
         inputbox.send_keys('testing')
         inputbox.send_keys(Keys.ENTER)
         self.esperar_fila_en_tabla_lista('1: testing')
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox = self.buscar_campo_de_entrada_item()
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,

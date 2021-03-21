@@ -49,7 +49,7 @@ class ListaViewTest(TestCase):
 
         self.client.post(
             f'/listas/{lista_correcta.id}/',
-            data={'texto_item': 'Nuevo item para lista existente.'}
+            data={'texto': 'Nuevo item para lista existente.'}
         )
 
         self.assertEqual(Item.objects.count(), 1)
@@ -63,7 +63,7 @@ class ListaViewTest(TestCase):
 
         response = self.client.post(
             f'/listas/{lista_correcta.id}/',
-            data={'texto_item': 'Nuevo item para lista existente.'}
+            data={'texto': 'Nuevo item para lista existente.'}
         )
 
         self.assertRedirects(response, f'/listas/{lista_correcta.id}/')
@@ -72,7 +72,7 @@ class ListaViewTest(TestCase):
         lista = Lista.objects.create()
         response = self.client.post(
             f'/listas/{lista.id}/',
-            data={'texto_item': ''}
+            data={'texto': ''}
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'lista.html')
@@ -83,7 +83,7 @@ class ListaViewTest(TestCase):
 class NuevaListaViewTest(TestCase):
 
     def test_puede_guardar_un_request_POST(self):
-        self.client.post('/listas/nueva', data={'texto_item': 'Nuevo item'})
+        self.client.post('/listas/nueva', data={'texto': 'Nuevo item'})
 
         self.assertEqual(Item.objects.count(), 1)
         nuevo_item = Item.objects.first()
@@ -91,18 +91,18 @@ class NuevaListaViewTest(TestCase):
 
     def test_redirige_luego_de_un_post(self):
         response = self.client.post(
-            '/listas/nueva', data={'texto_item': 'Nuevo item'})
+            '/listas/nueva', data={'texto': 'Nuevo item'})
         nueva_lista = Lista.objects.first()
         self.assertRedirects(response, f'/listas/{nueva_lista.id}/')
 
     def test_errores_de_validacion_se_envian_de_vuelta_a_template_home(self):
-        response = self.client.post('/listas/nueva', data={'texto_item': ''})
+        response = self.client.post('/listas/nueva', data={'texto': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
         error_esperado = 'No puede haber un item vacío en la lista.'
         self.assertContains(response, error_esperado)
 
     def test_items_de_lista_no_validos_no_se_guardan(self):
-        self.client.post('/listas/nueva', data={'texto_item': ''})
+        self.client.post('/listas/nueva', data={'texto': ''})
         self.assertEqual(Lista.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)

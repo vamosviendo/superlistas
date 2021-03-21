@@ -11,7 +11,7 @@ def home_page(request):
 
 def nueva_lista(request):
     lista = Lista.objects.create()
-    item = Item(texto=request.POST['texto_item'], lista=lista)
+    item = Item(texto=request.POST['texto'], lista=lista)
     try:
         item.full_clean()
         item.save()
@@ -28,7 +28,7 @@ def view_lista(request, lista_id):
 
     if request.method == 'POST':
         try:
-            item = Item(texto=request.POST['texto_item'], lista=lista)
+            item = Item(texto=request.POST['texto'], lista=lista)
             item.full_clean()
             item.save()
             return redirect(lista)

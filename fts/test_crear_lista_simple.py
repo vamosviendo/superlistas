@@ -15,7 +15,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('tareas', texto_encabezado)
 
         # Inmediatamente después hay una invitación a ingresar tareas
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox = self.buscar_campo_de_entrada_item()
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
             'Ingrese una tarea'
@@ -25,7 +25,7 @@ class NewVisitorTest(FunctionalTest):
 
         self.esperar_fila_en_tabla_lista('1: Hacer las compras')
 
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox = self.buscar_campo_de_entrada_item()
         inputbox.send_keys('Guardar las vituallas')
         inputbox.send_keys(Keys.ENTER)
 
@@ -36,7 +36,7 @@ class NewVisitorTest(FunctionalTest):
 
         # La usuaria Edith inicia una lista
         self.browser.get(self.live_server_url)
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox = self.buscar_campo_de_entrada_item()
         inputbox.send_keys('Hacer las compras')
         inputbox.send_keys(Keys.ENTER)
         self.esperar_fila_en_tabla_lista('1: Hacer las compras')
@@ -56,7 +56,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertNotIn('vituallas', texto_pag)
 
         # Francis da inicio a una nueva lista
-        inputbox = self.browser.find_element_by_id('id_item_nuevo')
+        inputbox = self.buscar_campo_de_entrada_item()
         inputbox.send_keys('Cortar el pasto')
         inputbox.send_keys(Keys.ENTER)
         self.esperar_fila_en_tabla_lista('1: Cortar el pasto')
