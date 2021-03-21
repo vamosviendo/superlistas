@@ -22,7 +22,7 @@ class ValidacionItemsTest(FunctionalTest):
         self.browser.find_element_by_id('id_item_nuevo').send_keys(Keys.ENTER)
 
         self.esperar_a(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector('.has_error').text,
+            self.browser.find_element_by_css_selector('.has-error').text,
             "No puede haber un item vacío en la lista."
         ))
 
@@ -30,6 +30,3 @@ class ValidacionItemsTest(FunctionalTest):
         self.browser.find_element_by_id('id_item_nuevo').send_keys(Keys.ENTER)
         self.esperar_fila_en_tabla_lista('1: comprar')
         self.esperar_fila_en_tabla_lista('2: hacer té')
-
-
-        self.fail('Terminar el test!')

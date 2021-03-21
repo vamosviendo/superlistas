@@ -2,4 +2,4 @@
 
 {% block texto_encabezado %}Comenzar una lista de tareas{% endblock texto_encabezado %}
 
-{% block form_action %}/listas/nueva{% endblock form_action %}
+{% block form_action %}{% url 'nueva_lista' %}{% endblock form_action %}
