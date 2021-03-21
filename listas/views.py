@@ -18,7 +18,7 @@ def nueva_lista(request):
         lista.delete()
         error = 'No puede haber un item vacío en la lista.'
         return render(request, 'home.html', {'error': error})
-    return redirect(f'/listas/{lista.id}/')
+    return redirect(lista)
 
 
 def view_lista(request, lista_id):
@@ -30,7 +30,7 @@ def view_lista(request, lista_id):
             item = Item(texto=request.POST['texto_item'], lista=lista)
             item.full_clean()
             item.save()
-            return redirect(f'/listas/{lista.id}/')
+            return redirect(lista)
         except ValidationError:
             error = 'No puede haber un item vacío en la lista.'
 
