@@ -16,9 +16,7 @@
           <h1>{% block texto_encabezado %}{% endblock texto_encabezado %}</h1>
           <form method="POST"
                 action="{% block form_action %}{% endblock form_action%}">
-            <input name="texto_item"
-                   id="id_item_nuevo" class="form-control input-lg"
-                   placeholder="Ingrese una tarea"/>
+            {{ form.text }}
             {% csrf_token %}
             {% if error %}
             <div class="form-group has-error">
