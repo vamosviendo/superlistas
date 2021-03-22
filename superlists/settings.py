@@ -43,6 +43,10 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'usuarios.User'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'usuarios.authentication.PasswordlessAuthenticationBackend',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,6 +128,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'htpruebas2020@gmail.com'
+EMAIL_HOST_PASSWORD = environ.get('EMAIL_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 LOGGING = {
     'version': 1,
