@@ -25,7 +25,6 @@ class LoginTest(FunctionalTest):
         self.assertEqual(email.subject, SUBJECT)
         self.assertIn('Usá este enlace para entrar', email.body)
         url_search = re.search(r'http://.+/.+$', email.body)
-        print('tipo de url_search:', type(url_search))
         if not url_search:
             self.fail(
                 f'No se encontró url en el cuerpo del mensaje:\n{email.body}')
@@ -37,3 +36,11 @@ class LoginTest(FunctionalTest):
         )
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertIn(TEST_EMAIL, navbar.text)
+
+        self.browser.find_element_by_link_text('Salir').click()
+
+        self.esperar_a(
+            lambda: self.browser.find_element_by_name('email')
+        )
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertNotIn(TEST_EMAIL, navbar.text)

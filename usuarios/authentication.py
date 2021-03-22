@@ -9,7 +9,6 @@ User = get_user_model()
 class PasswordlessAuthenticationBackend(ModelBackend):
 
     def authenticate(self, request, uid):
-        print('AUTHENTICATE!')
         try:
             token = Token.objects.get(uid=uid)
             return User.objects.get(email=token.email)
