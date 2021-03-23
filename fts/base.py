@@ -44,5 +44,19 @@ class FunctionalTest(StaticLiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
+    def esperar_ingreso(self, email):
+        self.esperar_a(
+            lambda: self.browser.find_element_by_link_text('Salir')
+        )
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertIn(email, navbar.text)
+
+    def esperar_salida(self, email):
+        self.esperar_a(
+            lambda: self.browser.find_element_by_name('email')
+        )
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertNotIn(email, navbar.text)
+
     def buscar_campo_de_entrada_item(self):
         return self.browser.find_element_by_id('id_texto')

@@ -44,8 +44,8 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'usuarios.User'
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'usuarios.authentication.PasswordlessAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [

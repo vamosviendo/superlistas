@@ -12,6 +12,8 @@ class LoginTest(FunctionalTest):
 
     def test_puede_ingresarse_con_el_link_de_email(self):
         self.browser.get(self.live_server_url)
+
+        # completar campo email
         self.browser.find_element_by_name('email').send_keys(TEST_EMAIL)
         self.browser.find_element_by_name('email').send_keys(Keys.ENTER)
 
@@ -30,17 +32,10 @@ class LoginTest(FunctionalTest):
                 f'No se encontró url en el cuerpo del mensaje:\n{email.body}')
         url = url_search.group(0)
         self.assertIn(self.live_server_url, url)
+
         self.browser.get(url)
-        self.esperar_a(
-            lambda: self.browser.find_element_by_link_text('Salir')
-        )
-        navbar = self.browser.find_element_by_css_selector('.navbar')
-        self.assertIn(TEST_EMAIL, navbar.text)
+        self.esperar_ingreso(email=TEST_EMAIL)
 
         self.browser.find_element_by_link_text('Salir').click()
 
-        self.esperar_a(
-            lambda: self.browser.find_element_by_name('email')
-        )
-        navbar = self.browser.find_element_by_css_selector('.navbar')
-        self.assertNotIn(TEST_EMAIL, navbar.text)
+        self.esperar_salida(email=TEST_EMAIL)
