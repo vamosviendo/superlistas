@@ -1,25 +1,22 @@
 from django.conf import settings
-from django.contrib.auth import \
-    BACKEND_SESSION_KEY, SESSION_KEY, get_user_model
-from django.contrib.sessions.backends.db import SessionStore
 
 from fts.base import FunctionalTest
-
-User = get_user_model()
+from fts.server_tools import crear_sesion_en_server
+from fts.management.commands.create_session import crear_sesion_preautenticada
 
 
 class MisListasTest(FunctionalTest):
 
     def crear_sesion_preautenticada(self, email):
-        usuario = User.objects.create(email=email)
-        sesion = SessionStore()
-        sesion[SESSION_KEY] = usuario.pk
-        sesion[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
-        sesion.save()
+        if self.staging_server:
+            session_key = crear_sesion_en_server(self.staging_server, email)
+        else:
+            session_key = crear_sesion_preautenticada(email)
+
         self.browser.get(self.live_server_url + '/404_no_existe/')
         self.browser.add_cookie(dict(
             name=settings.SESSION_COOKIE_NAME,
-            value=sesion.session_key,
+            value=session_key,
             path='/',
         ))
 

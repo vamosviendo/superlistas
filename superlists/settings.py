@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'listas',
     'usuarios',
+    'fts',
 ]
 
 AUTH_USER_MODEL = 'usuarios.User'
