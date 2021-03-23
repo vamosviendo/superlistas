@@ -44,6 +44,12 @@ class FunctionalTest(StaticLiveServerTestCase):
         return fn()
 
     @espera
+    def esperar_fila_en_tabla_lista(self, texto_fila):
+        tabla = self.browser.find_element_by_id('id_tabla_lista')
+        filas = tabla.find_elements_by_tag_name('tr')
+        self.assertIn(texto_fila, [fila.text for fila in filas])
+
+    @espera
     def esperar_ingreso(self, email):
         self.browser.find_element_by_link_text('Salir')
         navbar = self.browser.find_element_by_css_selector('.navbar')
