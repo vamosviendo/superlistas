@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block texto_encabezado %}Mis listas{% endblock texto_encabezado %}
+
+{% block form_lista %}{% endblock form_lista %}
+
+{% block cont_extra %}
+<h2>Listas de {{ owner.email }}</h2>
+<ul>
+  {% for lista in owner.list_set.all %}
+  <li><a href="{{ lista.get_absolute_url }}">{{ lista.nombre }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock cont_extra %}

@@ -28,3 +28,7 @@ def view_lista(request, lista_id):
             form.save()
             return redirect(lista)
     return render(request, 'lista.html', {'lista': lista, 'form': form})
+
+
+def mis_listas(request, email):
+    return render(request, 'mis_listas.html')

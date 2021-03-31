@@ -139,3 +139,10 @@ class NuevaListaViewTest(TestCase):
         self.client.post('/listas/nueva', data={'texto': ''})
         self.assertEqual(Lista.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
+
+
+class MisListasTest(TestCase):
+
+    def test_url_mis_listas_muestra_template_mis_listas(self):
+        response = self.client.get('/listas/usuarios/a@b.com/')
+        self.assertTemplateUsed(response, 'mis_listas.html')
