@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from listas.forms import ItemForm, ERROR_ITEM_VACIO, ERROR_ITEM_DUPLICADO, ItemListaExistenteForm
 from listas.models import Item, Lista
+
+User = get_user_model()
 
 
 class HomePageTest(TestCase):
@@ -144,5 +147,19 @@ class NuevaListaViewTest(TestCase):
 class MisListasTest(TestCase):
 
     def test_url_mis_listas_muestra_template_mis_listas(self):
+        User.objects.create(email='a@b.com')
         response = self.client.get('/listas/usuarios/a@b.com/')
         self.assertTemplateUsed(response, 'mis_listas.html')
+
+    def test_pasa_duenio_correcto_a_template(self):
+        User.objects.create(email='wrong@owner.com')
+        usuario_correcto = User.objects.create(email='a@b.com')
+        response = self.client.get('/listas/usuarios/a@b.com/')
+        self.assertEqual(response.context['duenio'], usuario_correcto)
+
+    def test_duenio_de_lista_se_guarda_si_usuario_esta_autenticado(self):
+        user = User.objects.create(email='a@b.com')
+        self.client.force_login(user)
+        self.client.post('/listas/nueva', data={'texto': 'item nuevo'})
+        lista = Lista.objects.first()
+        self.assertEqual(lista.duenio, user)
