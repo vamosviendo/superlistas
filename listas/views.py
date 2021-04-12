@@ -18,7 +18,7 @@ def nueva_lista(request):
         lista.duenio = request.user
         lista.save()
         form.save(en_lista=lista)
-        return redirect(lista)
+        return redirect(str(lista.get_absolute_url()))
     else:
         return render(request, 'home.html', {'form': form})
 

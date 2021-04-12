@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -157,9 +159,26 @@ class MisListasTest(TestCase):
         response = self.client.get('/listas/usuarios/a@b.com/')
         self.assertEqual(response.context['duenio'], usuario_correcto)
 
-    def test_duenio_de_lista_se_guarda_si_usuario_esta_autenticado(self):
+    @patch('listas.views.Lista')    # Reemplazar modelo Lista en listas.views
+    @patch('listas.views.ItemForm') # Reemplazar form ItemForm en listas.views
+    def test_duenio_de_lista_se_guarda_si_usuario_esta_autenticado(
+            self, mockItemFormClass, mockListaClass):
+        """ Truchamos el modelo Lista en listas.views.
+            De esta manera, sin preocuparnos por el funcionamiento interno de
+            Lista, chequeamos que la view listas.views.nueva_lista cumpla en
+            guardar como atributo duenio del modelo Lista al usuario
+            autenticado al momento de su creación.
+            (Nos interesa lo que hace listas.views.nueva_lista, no lo que
+            hace listas.models.Lista.
+        """
         user = User.objects.create(email='a@b.com')
         self.client.force_login(user)
+        lista_trucha = mockListaClass.return_value
+
+        def chequear_usuario_asignado():
+            self.assertEqual(lista_trucha.duenio, user)
+
+        lista_trucha.save.side_effect = chequear_usuario_asignado
+
         self.client.post('/listas/nueva', data={'texto': 'item nuevo'})
-        lista = Lista.objects.first()
-        self.assertEqual(lista.duenio, user)
+        lista_trucha.save.assert_called_once_with()
