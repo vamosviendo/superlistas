@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from listas.models import Item, Lista
+
+User = get_user_model()
 
 
 class ItemModelTest(TestCase):
@@ -58,3 +61,33 @@ class ListaModelTest(TestCase):
     def test_get_absolute_url(self):
         lista = Lista.objects.create()
         self.assertEqual(lista.get_absolute_url(), f'/listas/{lista.id}/')
+
+    def test_crear_crea_lista_y_primer_item(self):
+        Lista.crear(texto_primer_item='texto de item nuevo')
+        item_nuevo = Item.objects.first()
+        self.assertEqual(item_nuevo.texto, 'texto de item nuevo')
+        lista_nueva = Lista.objects.first()
+        self.assertEqual(item_nuevo.lista, lista_nueva)
+
+    def test_crear_devuelve_un_nuevo_objeto_lista(self):
+        lista = Lista.crear(texto_primer_item='txt')
+        nueva_lista = Lista.objects.first()
+        self.assertEqual(lista, nueva_lista)
+
+    def test_listas_pueden_tener_duenios(self):
+        Lista(duenio=User())    # No debe dar error
+
+    def test_duenio_es_optativo_en_listas(self):
+        Lista().full_clean()    # No debe dar error
+
+    def test_crear_permite_guardar_duenio(self):
+        user = User.objects.create()
+        Lista.crear(texto_primer_item='texto de item nuevo', duenio=user)
+        lista_nueva = Lista.objects.first()
+        self.assertEqual(lista_nueva.duenio, user)
+
+    def test_nombre_de_lista_es_el_texto_del_primer_item(self):
+        lista = Lista.objects.create()
+        Item.objects.create(lista=lista, texto='primer item')
+        Item.objects.create(lista=lista, texto='segundo item')
+        self.assertEqual(lista.nombre, 'primer item')

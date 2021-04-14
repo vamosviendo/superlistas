@@ -1,10 +1,13 @@
-from unittest.mock import patch
+from unittest import TestCase as unittest_TestCase
+from unittest.mock import patch, Mock, MagicMock
 
 from django.contrib.auth import get_user_model
+from django.http import HttpRequest
 from django.test import TestCase
 
 from listas.forms import ItemForm, ERROR_ITEM_VACIO, ERROR_ITEM_DUPLICADO, ItemListaExistenteForm
 from listas.models import Item, Lista
+from listas.views import nueva_lista
 
 User = get_user_model()
 
@@ -112,7 +115,7 @@ class ListaViewTest(TestCase):
         self.assertContains(response, 'name="texto"')
 
 
-class NuevaListaViewTest(TestCase):
+class NuevaListaViewTestIntegrado(TestCase):
 
     def test_puede_guardar_un_request_POST(self):
         self.client.post('/listas/nueva', data={'texto': 'Nuevo item'})
@@ -121,30 +124,85 @@ class NuevaListaViewTest(TestCase):
         nuevo_item = Item.objects.first()
         self.assertEqual(nuevo_item.texto, 'Nuevo item')
 
-    def test_redirige_luego_de_un_post(self):
-        response = self.client.post(
-            '/listas/nueva', data={'texto': 'Nuevo item'})
-        nueva_lista = Lista.objects.first()
-        self.assertRedirects(response, f'/listas/{nueva_lista.id}/')
-
-    def test_si_la_entrada_no_es_valida_muestra_template_home(self):
+    def test_si_la_entrada_no_es_valida_no_guarda_y_muestra_errores(self):
         response = self.client.post('/listas/nueva', data={'texto': ''})
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'home.html')
-
-    def test_errores_de_validacion_se_muestran_en_pagina_home(self):
-        response = self.client.post('/listas/nueva', data={'texto': ''})
+        self.assertEqual(Lista.objects.count(), 0)
         self.assertContains(response, ERROR_ITEM_VACIO)
 
-    def test_si_la_entrada_no_es_valida_pasa_form_a_template(self):
-        response = self.client.post('/listas/nueva', data={'texto': ''})
-        self.assertIsInstance(response.context['form'], ItemForm)
+    def test_duenio_de_lista_se_guarda_si_usuario_esta_autenticado(self):
+        user = User.objects.create(email='a@b.com')
+        self.client.force_login(user)
+        self.client.post('/listas/nueva', data={'texto': 'item nuevo'})
+        lista = Lista.objects.first()
+        self.assertEqual(lista.duenio, user)
 
-    def test_items_de_lista_no_validos_no_se_guardan(self):
-        self.client.post('/listas/nueva', data={'texto': ''})
-        self.assertEqual(Lista.objects.count(), 0)
-        self.assertEqual(Item.objects.count(), 0)
 
+def patch_save():
+    mock = MagicMock()
+    mock.return_value.save.return_value.get_absolute_url.return_value = 'stub'
+    return mock
+
+
+@patch('listas.views.NuevaListaForm', new_callable=patch_save)
+class NuevaListaViewUnitTest(unittest_TestCase):
+    """ (1) La clase TestCase de Django hace que sea demasiado fácil escribir
+            tests integrados. Para asegurarnos de escribir unit tests aislados
+            "puros" sólo usaremos unittest.TestCase.
+        (2) Truchamos la clase NuevaListaForm (que todavía no existe). Vamos
+            a usarla en todos los tests, así que la truchamos a nivel de la
+            clase.
+        (3) Armamos un request POST básico en setUp, construyendo el request
+            a mano en vez de usar el cliente de tests de Django.
+        (4) Comprobamos lo primero en relación a la vista nueva_lista2:
+            inicializa a su colaborador, NuevaListaForm, con el constructor
+            correcto: los datos del request."""
+
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.POST['texto'] = 'item de lista nuevo'  # (3)
+        self.request.user = Mock()
+
+    def test_pasa_datos_POST_a_NuevaListaForm(self, mockNuevaListaForm):
+        nueva_lista(self.request)
+        mockNuevaListaForm.assert_called_once_with(data=self.request.POST) # (4)
+
+    def test_salva_el_form_con_duenio_si_es_valido(self, mockNuevaListaForm):
+        form_trucho = mockNuevaListaForm.return_value
+        form_trucho.is_valid.return_value = True
+        nueva_lista(self.request)
+        form_trucho.save.assert_called_once_with(duenio=self.request.user)
+
+    @patch('listas.views.redirect')
+    def test_redirige_a_objeto_devuelto_por_el_form_si_el_form_es_valido(
+            self, mock_redirect, mockNuevaListaForm):
+        form_trucho = mockNuevaListaForm.return_value
+        form_trucho.is_valid.return_value = True
+
+        response = nueva_lista(self.request)
+
+        self.assertEqual(response, mock_redirect.return_value)
+        mock_redirect.assert_called_once_with(form_trucho.save.return_value)
+
+    @patch('listas.views.render')
+    def test_dibuja_template_home_con_form_si_el_form_no_es_valido(
+            self, mock_render, mockNuevaListaForm):
+        form_trucho = mockNuevaListaForm.return_value
+        form_trucho.is_valid.return_value = False
+
+        response = nueva_lista(self.request)
+
+        self.assertEqual(response, mock_render.return_value)
+        mock_render.assert_called_once_with(
+            self.request, 'home.html', {'form': form_trucho}
+        )
+
+    def test_no_guarda_form_si_no_es_valido(self, mockNuevaListaForm):
+        form_trucho = mockNuevaListaForm.return_value
+        form_trucho.is_valid.return_value = False
+
+        nueva_lista(self.request)
+
+        self.assertFalse(form_trucho.save.called)
 
 class MisListasTest(TestCase):
 
@@ -158,27 +216,3 @@ class MisListasTest(TestCase):
         usuario_correcto = User.objects.create(email='a@b.com')
         response = self.client.get('/listas/usuarios/a@b.com/')
         self.assertEqual(response.context['duenio'], usuario_correcto)
-
-    @patch('listas.views.Lista')    # Reemplazar modelo Lista en listas.views
-    @patch('listas.views.ItemForm') # Reemplazar form ItemForm en listas.views
-    def test_duenio_de_lista_se_guarda_si_usuario_esta_autenticado(
-            self, mockItemFormClass, mockListaClass):
-        """ Truchamos el modelo Lista en listas.views.
-            De esta manera, sin preocuparnos por el funcionamiento interno de
-            Lista, chequeamos que la view listas.views.nueva_lista cumpla en
-            guardar como atributo duenio del modelo Lista al usuario
-            autenticado al momento de su creación.
-            (Nos interesa lo que hace listas.views.nueva_lista, no lo que
-            hace listas.models.Lista.
-        """
-        user = User.objects.create(email='a@b.com')
-        self.client.force_login(user)
-        lista_trucha = mockListaClass.return_value
-
-        def chequear_usuario_asignado():
-            self.assertEqual(lista_trucha.duenio, user)
-
-        lista_trucha.save.side_effect = chequear_usuario_asignado
-
-        self.client.post('/listas/nueva', data={'texto': 'item nuevo'})
-        lista_trucha.save.assert_called_once_with()

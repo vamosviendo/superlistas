@@ -21,10 +21,19 @@ class ItemForm(forms.models.ModelForm):
         error_messages = {
             'texto': {'required': ERROR_ITEM_VACIO}
         }
+    #
+    # def save(self, en_lista):
+    #     self.instance.lista = en_lista
+    #     return super().save()
 
-    def save(self, en_lista):
-        self.instance.lista = en_lista
-        return super().save()
+
+class NuevaListaForm(ItemForm):
+
+    def save(self, duenio):
+        if duenio.is_authenticated:
+            return Lista.crear(
+                texto_primer_item=self.cleaned_data['texto'], duenio=duenio)
+        return Lista.crear(texto_primer_item=self.cleaned_data['texto'])
 
 
 class ItemListaExistenteForm(ItemForm):
@@ -46,5 +55,5 @@ class ItemListaExistenteForm(ItemForm):
         item_nuevo = form.save()
         self.assertEqual(item_nuevo, Item.objects.all()[0])
 
-    def save(self):
-        return forms.models.ModelForm.save(self)
+    # def save(self):
+    #     return forms.models.ModelForm.save(self)

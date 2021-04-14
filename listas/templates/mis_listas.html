@@ -7,7 +7,7 @@
 {% block cont_extra %}
 <h2>Listas de {{ duenio.email }}</h2>
 <ul>
-  {% for lista in duenio.list_set.all %}
+  {% for lista in duenio.lista_set.all %}
   <li><a href="{{ lista.get_absolute_url }}">{{ lista.nombre }}</a></li>
   {% endfor %}
 </ul>

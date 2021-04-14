@@ -1,7 +1,9 @@
+import unittest
+from unittest.mock import patch, Mock
 from django.test import TestCase
 
-from listas.forms import (
-    ERROR_ITEM_DUPLICADO, ERROR_ITEM_VACIO, ItemForm, ItemListaExistenteForm)
+from listas.forms import (ERROR_ITEM_DUPLICADO, ERROR_ITEM_VACIO, ItemForm,
+                          ItemListaExistenteForm, NuevaListaForm)
 from listas.models import Lista, Item
 
 
@@ -16,14 +18,6 @@ class ItemFormTest(TestCase):
         form = ItemForm(data={'text': ''})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['texto'], [ERROR_ITEM_VACIO])
-
-    def test_form_save_maneja_el_guardado_en_una_lista(self):
-        lista = Lista.objects.create()
-        form = ItemForm(data={'texto': 'hacerme'})
-        nuevo_item = form.save(en_lista=lista)
-        self.assertEqual(nuevo_item, Item.objects.first())
-        self.assertEqual(nuevo_item.texto, 'hacerme')
-        self.assertEqual(nuevo_item.lista, lista)
 
 
 class ItemListaExistenteFormTest(TestCase):
@@ -47,3 +41,35 @@ class ItemListaExistenteFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['texto'], [ERROR_ITEM_DUPLICADO])
 
+
+class NuevaListaFormTest(unittest.TestCase):
+
+    @patch('listas.forms.Lista.crear')
+    def test_save_crea_lista_nueva_a_partir_de_datos_post_si_el_usuario_no_esta_autenticado(
+            self, mockList_crear):
+        user = Mock(is_authenticated=False)
+        form = NuevaListaForm(data={'texto': 'texto de item nuevo'})
+        form.is_valid()
+        form.save(duenio=user)
+        mockList_crear.assert_called_once_with(
+            texto_primer_item='texto de item nuevo'
+        )
+
+    @patch('listas.forms.Lista.crear')
+    def test_save_crea_lista_nueva_con_duenio_si_el_usuario_esta_autenticado(
+            self, mockLista_crear):
+        user = Mock(is_authenticated=True)
+        form = NuevaListaForm(data={'texto': 'texto de item nuevo'})
+        form.is_valid()
+        form.save(duenio=user)
+        mockLista_crear.assert_called_once_with(
+            texto_primer_item='texto de item nuevo', duenio=user
+        )
+
+    @patch('listas.forms.Lista.crear')
+    def test_save_devuelve_un_nuevo_objeto_lista(self, mockLista_crear):
+        user = Mock(is_authenticated=True)
+        form = NuevaListaForm(data={'texto': 'texto de item nuevo'})
+        form.is_valid()
+        response = form.save(duenio=user)
+        self.assertEqual(response, mockLista_crear.return_value)

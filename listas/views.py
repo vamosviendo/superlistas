@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect, render
 
-from listas.forms import ItemForm, ItemListaExistenteForm
+from listas.forms import ItemForm, ItemListaExistenteForm, NuevaListaForm
 from listas.models import Lista
 
 User = get_user_model()
@@ -12,15 +12,12 @@ def home_page(request):
 
 
 def nueva_lista(request):
-    form = ItemForm(data=request.POST)
+    form = NuevaListaForm(data=request.POST)
     if form.is_valid():
-        lista = Lista()
-        lista.duenio = request.user
-        lista.save()
-        form.save(en_lista=lista)
-        return redirect(str(lista.get_absolute_url()))
-    else:
-        return render(request, 'home.html', {'form': form})
+        lista = form.save(duenio=request.user)
+        return redirect(lista)
+
+    return render(request, 'home.html', {'form': form})
 
 
 def view_lista(request, lista_id):
