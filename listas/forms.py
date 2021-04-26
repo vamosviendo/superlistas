@@ -21,10 +21,6 @@ class ItemForm(forms.models.ModelForm):
         error_messages = {
             'texto': {'required': ERROR_ITEM_VACIO}
         }
-    #
-    # def save(self, en_lista):
-    #     self.instance.lista = en_lista
-    #     return super().save()
 
 
 class NuevaListaForm(ItemForm):
