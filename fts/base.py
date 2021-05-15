@@ -1,5 +1,7 @@
 import os
 import time
+from datetime import datetime
+from pathlib import Path
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
@@ -10,6 +12,8 @@ from fts.server_tools import reset_database
 
 
 MAX_WAIT = 10
+
+SCREEN_DUMP_LOCATION = Path(__file__).resolve().parent / 'screendumps'
 
 
 def espera(fn):
@@ -37,7 +41,35 @@ class FunctionalTest(StaticLiveServerTestCase):
             reset_database(self.staging_server)
 
     def tearDown(self):
+        if self._test_fallido():
+            if not SCREEN_DUMP_LOCATION.exists():
+                SCREEN_DUMP_LOCATION.mkdir()
+            for ix, handle in enumerate(self.browser.window_handles):
+                self._windowid = ix
+                self.browser.switch_to.window(handle)
+                self.tomar_foto()
+                self.volcar_html()
         self.browser.quit()
+        super().tearDown()
+
+    def _test_fallido(self):
+        return any(error for (method, error) in self._outcome.errors)
+
+    def tomar_foto(self):
+        filename = self._generar_nombre_archivo() + '.png'
+        print('guardando foto en', filename)
+        self.browser.get_screenshot_as_file(filename)
+
+    def volcar_html(self):
+        filename = self._generar_nombre_archivo() + '.html'
+        print('volcando HTML de la página a', filename)
+        with open(filename, 'w') as f:
+            f.write(self.browser.page_source)
+
+    def _generar_nombre_archivo(self):
+        timestamp = datetime.now().isoformat().replace(':', '.')[:19]
+        return f'{SCREEN_DUMP_LOCATION}/{self.__class__.__name__}.' \
+               f'{self._testMethodName}-window{self._windowid}-{timestamp}'
 
     @espera
     def esperar_a(self, fn):

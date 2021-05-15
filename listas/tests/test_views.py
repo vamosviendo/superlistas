@@ -204,6 +204,7 @@ class NuevaListaViewUnitTest(unittest_TestCase):
 
         self.assertFalse(form_trucho.save.called)
 
+
 class MisListasTest(TestCase):
 
     def test_url_mis_listas_muestra_template_mis_listas(self):
