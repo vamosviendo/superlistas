@@ -34,8 +34,8 @@ def espera(fn):
 class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
-        logpath = Path(os.environ.get('HOME')) / 'geckodriver.log'
-        self.browser = webdriver.Firefox(log_path=logpath)
+        self.logpath = Path(os.environ.get('HOME')) / 'geckodriver.log'
+        self.browser = webdriver.Firefox(log_path=self.logpath)
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = 'http://' + self.staging_server

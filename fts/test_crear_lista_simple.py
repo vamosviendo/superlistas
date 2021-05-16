@@ -47,7 +47,7 @@ class NewVisitorTest(FunctionalTest):
         # La usuaria Edith abandona el sitio. El usuario Francis ingresa al
         # sitio.
         self.browser.quit()
-        self.browser = webdriver.Firefox()
+        self.browser = webdriver.Firefox(log_path=self.logpath)
         self.browser.get(self.live_server_url)
 
         # No hay rastros de la lista de Edith
