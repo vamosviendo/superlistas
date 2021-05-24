@@ -1,5 +1,7 @@
 from selenium import webdriver
+
 from .base import FunctionalTest
+from .pag_lista import PagLista
 
 
 def quit_if_possible(browser):
@@ -23,11 +25,12 @@ class SharingTest(FunctionalTest):
 
         self.browser = edith_browser
         self.browser.get(self.live_server_url)
-        self.agregar_item_a_lista('Conseguir ayuda')
+        pag_lista = PagLista(self).agregar_item_a_lista('Conseguir ayuda')
 
-        share_box = self.browser.find_element_by_css_selector(
-            'input[name="sharee"]')
+        share_box = pag_lista.obtener_share_box()
         self.assertEqual(
             share_box.get_attribute('placeholder'),
             'su-amigo@ejemploc.com'
         )
+
+        pag_lista.compartir_lista_con('oniciferous@example.com')

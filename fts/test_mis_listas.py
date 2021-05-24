@@ -1,4 +1,5 @@
 from fts.base import FunctionalTest
+from fts.pag_lista import PagLista
 
 
 class MisListasTest(FunctionalTest):
@@ -7,8 +8,9 @@ class MisListasTest(FunctionalTest):
 
         self.crear_sesion_preautenticada('pipi@pupu.com')
         self.browser.get(self.live_server_url)
-        self.agregar_item_a_lista('Reticulate splines')
-        self.agregar_item_a_lista('Immanentize eschaton')
+        pag_lista = PagLista(self)
+        pag_lista.agregar_item_a_lista('Reticulate splines')
+        pag_lista.agregar_item_a_lista('Immanentize eschaton')
         url_primera_lista = self.browser.current_url
 
         self.browser.find_element_by_link_text('Mis listas').click()
@@ -24,7 +26,7 @@ class MisListasTest(FunctionalTest):
 
         # Comenzar otra lista
         self.browser.get(self.live_server_url)
-        self.agregar_item_a_lista('Click cows')
+        pag_lista.agregar_item_a_lista('Click cows')
         url_segunda_lista = self.browser.current_url
 
         # Aparece una segunda lista debajo de "mis listas"

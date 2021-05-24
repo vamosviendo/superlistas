@@ -1,6 +1,7 @@
 from selenium.webdriver.common.keys import Keys
 
 from .base import FunctionalTest
+from .pag_lista import PagLista
 
 
 class DyETest(FunctionalTest):
@@ -10,7 +11,8 @@ class DyETest(FunctionalTest):
         self.browser.set_window_size(1024, 768)
 
         # El campo inputbox debe estar centrado en la página
-        inputbox = self.buscar_campo_de_entrada_item()
+        pl = PagLista(self)
+        inputbox = pl.buscar_campo_de_entrada_item()
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
@@ -19,8 +21,8 @@ class DyETest(FunctionalTest):
 
         inputbox.send_keys('testing')
         inputbox.send_keys(Keys.ENTER)
-        self.esperar_fila_en_tabla_lista('1: testing')
-        inputbox = self.buscar_campo_de_entrada_item()
+        pl.esperar_fila_en_tabla_lista('testing', 1)
+        inputbox = pl.buscar_campo_de_entrada_item()
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
