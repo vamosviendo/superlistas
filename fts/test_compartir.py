@@ -2,6 +2,7 @@ from selenium import webdriver
 
 from .base import FunctionalTest
 from .pag_lista import PagLista
+from .pag_mis_listas import PagMisListas
 
 
 def quit_if_possible(browser):
@@ -34,3 +35,18 @@ class SharingTest(FunctionalTest):
         )
 
         pag_lista.compartir_lista_con('oniciferous@example.com')
+
+        self.browser = oni_browser
+        PagMisListas(self).ir_a_pag_mis_listas()
+
+        self.esperar_a(
+            lambda: self.assertEqual(
+                pag_lista.obtener_duenio_de_lista(),
+                'edith@example.com'
+            )
+        )
+        pag_lista.agregar_item_a_lista('Hola Edith!')
+
+        self.browser = edith_browser
+        self.browser.refresh()
+        pag_lista.esperar_fila_en_tabla_lista('Hola Edith!', 2)

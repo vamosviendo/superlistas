@@ -31,7 +31,7 @@ class PagLista:
         return self
 
     def obtener_share_box(self):
-        return self.test.browser.find_elements_by_css_selector(
+        return self.test.browser.find_element_by_css_selector(
             'input[name="sharee"]')
 
     def obtener_lista_compartido_con(self):
@@ -46,3 +46,6 @@ class PagLista:
                 [item.text for item in self.obtener_lista_compartido_con()]
             )
         )
+
+    def obtener_duenio_de_lista(self):
+        return self.test.browser.find_element_by_id('id_duenio_lista').text
