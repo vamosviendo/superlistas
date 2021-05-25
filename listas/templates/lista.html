@@ -10,4 +10,16 @@
   <tr><td>{{ forloop.counter }}: {{ item.texto }}</td></tr>
   {% endfor %}
 </table>
+<form action="{% url 'compartir_lista' lista.id %}" method="post">
+  <input type="email" name="sharee" placeholder="su-amigo@ejemploc.com">
+  {% csrf_token %}
+</form>
+<h2>Dueño lista</h2>
+<div id="id_duenio_lista">{{ lista.duenio.email }}</div>
+<h2>Compartida con</h2>
+<ul>
+  {% for usuario in lista.compartida_con.all %}
+  <li class="list-sharee">{{ usuario.email }}</li>
+  {% endfor %}
+</ul>
 {% endblock tabla %}

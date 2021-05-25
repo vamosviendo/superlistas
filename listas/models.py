@@ -1,6 +1,10 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
+
+
+User = get_user_model()
 
 
 class Lista(models.Model):
@@ -9,6 +13,8 @@ class Lista(models.Model):
         settings.AUTH_USER_MODEL,
         blank=True, null=True, on_delete=models.CASCADE
     )
+    compartida_con = models.ManyToManyField(
+        to=User, related_name='listas_compartidas')
 
     def get_absolute_url(self):
         return reverse('view_lista', args=[self.pk])
@@ -22,6 +28,9 @@ class Lista(models.Model):
     @property
     def nombre(self):
         return self.item_set.first().texto
+
+    def compartir_con(self, usuario):
+        self.compartida_con.add(usuario)
 
 
 class Item(models.Model):

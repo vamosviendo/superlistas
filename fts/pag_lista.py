@@ -40,7 +40,7 @@ class PagLista:
     def compartir_lista_con(self, email):
         self.obtener_share_box().send_keys(email)
         self.obtener_share_box().send_keys(Keys.ENTER)
-        self.test.esperar(
+        self.test.esperar_a(
             lambda: self.test.assertIn(
                 email,
                 [item.text for item in self.obtener_lista_compartido_con()]

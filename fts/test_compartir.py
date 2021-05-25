@@ -39,6 +39,8 @@ class SharingTest(FunctionalTest):
         self.browser = oni_browser
         PagMisListas(self).ir_a_pag_mis_listas()
 
+        self.browser.find_element_by_link_text('Conseguir ayuda').click()
+
         self.esperar_a(
             lambda: self.assertEqual(
                 pag_lista.obtener_duenio_de_lista(),

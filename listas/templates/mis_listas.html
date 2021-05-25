@@ -11,4 +11,10 @@
   <li><a href="{{ lista.get_absolute_url }}">{{ lista.nombre }}</a></li>
   {% endfor %}
 </ul>
+<h2>Listas compartidas con {{ duenio.email }}</h2>
+<ul>
+  {% for lista in duenio.listas_compartidas.all %}
+  <li><a href="{{ lista.get_absolute_url }}">{{ lista.nombre }}</a></li>
+  {% endfor %}
+</ul>
 {% endblock cont_extra %}

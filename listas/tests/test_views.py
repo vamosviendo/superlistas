@@ -4,6 +4,7 @@ from unittest.mock import patch, Mock, MagicMock
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.test import TestCase
+from django.urls import reverse
 
 from listas.forms import ItemForm, ERROR_ITEM_VACIO, ERROR_ITEM_DUPLICADO, ItemListaExistenteForm
 from listas.models import Item, Lista
@@ -203,6 +204,27 @@ class NuevaListaViewUnitTest(unittest_TestCase):
         nueva_lista(self.request)
 
         self.assertFalse(form_trucho.save.called)
+
+
+class CompartirListaTest(TestCase):
+
+    def test_POST_redirige_a_pagina_de_lista(self):
+        lista = Lista.objects.create()
+        user = User.objects.create(email='janelle@monae.com')
+        response = self.client.post(
+            f'/listas/{lista.id}/compartir',
+            data={'sharee': user.email}
+        )
+        self.assertRedirects(response, f'/listas/{lista.id}/')
+
+    def test_POST_agrega_usuario_a_lista_compartitarios(self):
+        lista = Lista.objects.create()
+        user = User.objects.create(email='a@b.com')
+        self.client.post(
+            reverse('compartir_lista', args=[lista.id]),
+            data={'sharee': user.email}
+        )
+        self.assertIn(user, lista.compartida_con.all())
 
 
 class MisListasTest(TestCase):

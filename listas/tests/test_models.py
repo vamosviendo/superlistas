@@ -91,3 +91,10 @@ class ListaModelTest(TestCase):
         Item.objects.create(lista=lista, texto='primer item')
         Item.objects.create(lista=lista, texto='segundo item')
         self.assertEqual(lista.nombre, 'primer item')
+
+    def test_compartir_con_agrega_usuario_a_lista_compartitarios(self):
+        lista = Lista.objects.create()
+        user = User.objects.create(email='em@ail.com')
+        lista.compartir_con(user)
+        lista2 = Lista.objects.get(id=lista.id)
+        self.assertIn(user, lista2.compartida_con.all())

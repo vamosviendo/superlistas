@@ -32,6 +32,13 @@ def view_lista(request, lista_id):
     return render(request, 'lista.html', {'lista': lista, 'form': form})
 
 
+def compartir_lista(request, lista_id):
+    lista = Lista.objects.get(id=lista_id)
+    user = User.objects.get(email=request.POST.get('sharee'))
+    lista.compartir_con(user)
+    return redirect(lista)
+
+
 def mis_listas(request, email):
     duenio = User.objects.get(email=email)
     return render(request, 'mis_listas.html', {'duenio': duenio})

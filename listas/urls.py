@@ -20,5 +20,9 @@ from listas import views
 urlpatterns = [
     path('nueva', views.nueva_lista, name='nueva_lista'),
     path('<int:lista_id>/', views.view_lista, name='view_lista'),
+    path(
+        '<int:lista_id>/compartir', views.compartir_lista,
+        name='compartir_lista'
+    ),
     path('usuarios/<str:email>/', views.mis_listas, name='mis_listas'),
 ]

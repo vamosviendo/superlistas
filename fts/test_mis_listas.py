@@ -14,7 +14,6 @@ class MisListasTest(FunctionalTest):
         pl.agregar_item_a_lista('Immanentize eschaton')
         url_primera_lista = self.browser.current_url
 
-        # self.browser.find_element_by_link_text('Mis listas').click()
         pml = PagMisListas(self).ir_a_pag_mis_listas()
 
         self.esperar_a(
@@ -33,7 +32,6 @@ class MisListasTest(FunctionalTest):
 
         # Aparece una segunda lista debajo de "mis listas"
         pml.ir_a_pag_mis_listas()
-        # self.browser.find_element_by_link_text('Mis listas').click()
         self.esperar_a(
             lambda: self.browser.find_element_by_link_text('Click cows')
         )
