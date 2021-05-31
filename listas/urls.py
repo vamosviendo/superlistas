@@ -18,8 +18,8 @@ from django.urls import path
 from listas import views
 
 urlpatterns = [
-    path('nueva', views.nueva_lista, name='nueva_lista'),
-    path('<int:lista_id>/', views.view_lista, name='view_lista'),
+    path('nueva', views.NuevaListaView.as_view(), name='nueva_lista'),
+    path('<int:pk>/', views.VerYAgregarALista.as_view(), name='view_lista'),
     path(
         '<int:lista_id>/compartir', views.compartir_lista,
         name='compartir_lista'

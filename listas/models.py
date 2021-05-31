@@ -43,3 +43,6 @@ class Item(models.Model):
 
     def __str__(self):
         return self.texto
+
+    def get_absolute_url(self):
+        return reverse('view_lista', args=[self.lista.id])

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect, render
-from django.views.generic import FormView
+from django.views.generic import CreateView, DetailView, FormView
 
 from listas.forms import ItemForm, ItemListaExistenteForm, NuevaListaForm
 from listas.models import Lista
@@ -26,6 +26,13 @@ def nueva_lista(request):
     return render(request, 'home.html', {'form': form})
 
 
+class NuevaListaView(CreateView, HomePageView):
+    form_class = NuevaListaForm
+
+    def form_valid(self, form):
+        lista = form.save(duenio=self.request.user)
+        return redirect(lista)
+
 def view_lista(request, lista_id):
     lista = Lista.objects.get(id=lista_id)
     form = ItemListaExistenteForm(en_lista=lista)
@@ -36,6 +43,16 @@ def view_lista(request, lista_id):
             form.save()
             return redirect(lista)
     return render(request, 'lista.html', {'lista': lista, 'form': form})
+
+
+class VerYAgregarALista(DetailView, CreateView):
+    model = Lista
+    template_name = 'lista.html'
+    form_class = ItemListaExistenteForm
+
+    def get_form(self):
+        self.object = self.get_object()
+        return self.form_class(en_lista=self.object, data=self.request.POST)
 
 
 def compartir_lista(request, lista_id):
