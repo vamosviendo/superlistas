@@ -20,7 +20,7 @@ from listas import urls as lista_urls
 from usuarios import urls as usuarios_urls
 
 urlpatterns = [
-    path('', lista_views.home_page, name='home'),
+    path('', lista_views.HomePageView.as_view(), name='home'),
     path('listas/', include(lista_urls)),
     path('usuarios/', include(usuarios_urls)),
 ]
