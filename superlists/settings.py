@@ -132,7 +132,7 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'htpruebas2020@gmail.com'
-# EMAIL_HOST_PASSWORD = environ.get('EMAIL_PASSWORD')
+EMAIL_HOST_PASSWORD = environ.get('EMAIL_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

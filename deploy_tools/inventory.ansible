@@ -1,0 +1,5 @@
+[live]
+superlists.lilianamedela.com.ar ansible_become=yes ansible_ssh_user=nando
+
+[staging]
+superlists-staging.lilianamedela.com.ar ansible_become=yes ansible_ssh_user=nando
